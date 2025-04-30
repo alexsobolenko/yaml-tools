@@ -21,12 +21,10 @@ export class DotenvDefinitionProvider implements DefinitionProvider {
             return null;
         }
 
+        let varName: string|null = null;
         const text = document.getText(wordRange);
-        let varName: string | null = null;
-
         const envMatch = text.match(/^%env\(([^)]+)\)%$/);
         const dockerMatch = text.match(/^\${([^}]+)}$/);
-
         if (envMatch) {
             const raw = envMatch[1] as string;
             const parts = raw.split(':');
@@ -35,10 +33,6 @@ export class DotenvDefinitionProvider implements DefinitionProvider {
             varName = dockerMatch[1] as string;
         }
 
-        if (varName) {
-            return App.instance.cacheManager.getParamDefinition(varName);
-        }
-
-        return null;
+        return varName === null ? null : App.instance.cacheManager.getParamDefinition(varName);
     }
 }

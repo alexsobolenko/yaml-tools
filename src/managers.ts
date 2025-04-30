@@ -1,47 +1,48 @@
 import {Location, Uri} from 'vscode';
 
 export class CacheManager {
-    private cache = new Map<string, Location>();
-    private history = new Map<string, Location[]>();
-    private fileToParams = new Map<string, Set<string>>();
+    private _cache = new Map<string, Location>();
+    private _history = new Map<string, Location[]>();
+    private _fileToParams = new Map<string, Set<string>>();
 
     cacheParam(paramName: string, location: Location) {
-        if (!this.history.has(paramName)) {
-            this.history.set(paramName, []);
+        if (!this._history.has(paramName)) {
+            this._history.set(paramName, []);
         }
 
-        this.history.get(paramName)!.push(location);
-        this.cache.set(paramName, location);
+        this._history.get(paramName)!.push(location);
+        this._cache.set(paramName, location);
 
         const fileUri = location.uri.toString();
-        if (!this.fileToParams.has(fileUri)) {
-            this.fileToParams.set(fileUri, new Set());
+        if (!this._fileToParams.has(fileUri)) {
+            this._fileToParams.set(fileUri, new Set());
         }
 
-        this.fileToParams.get(fileUri)!.add(paramName);
+        this._fileToParams.get(fileUri)!.add(paramName);
     }
 
     invalidateFile(fileUri: Uri) {
         const fileKey = fileUri.toString();
-        const paramsInFile = this.fileToParams.get(fileKey);
+        const paramsInFile = this._fileToParams.get(fileKey);
         if (paramsInFile) {
             paramsInFile.forEach((paramName) => {
-                const locations = this.history.get(paramName) || [];
+                const locations = this._history.get(paramName) || [];
                 const updatedLocations = locations.filter((loc) => loc.uri.toString() !== fileKey);
-                this.history.set(paramName, updatedLocations);
+
+                this._history.set(paramName, updatedLocations);
 
                 if (updatedLocations.length > 0) {
-                    this.cache.set(paramName, updatedLocations[updatedLocations.length - 1]);
+                    this._cache.set(paramName, updatedLocations[updatedLocations.length - 1]);
                 } else {
-                    this.cache.delete(paramName);
+                    this._cache.delete(paramName);
                 }
             });
 
-            this.fileToParams.delete(fileKey);
+            this._fileToParams.delete(fileKey);
         }
     }
 
     getParamDefinition(paramName: string): Location|undefined {
-        return this.cache.get(paramName);
+        return this._cache.get(paramName);
     }
 }

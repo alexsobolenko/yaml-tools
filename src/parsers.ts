@@ -15,10 +15,9 @@ export class YamlParser {
             await this.cacheParametersFromFile(document.uri, content);
         } catch (error: any) {
             if (error.name === 'YAMLParseError' && error.code === 'DUPLICATE_KEY') {
-                // eslint-disable-next-line max-len
-                window.showWarningMessage(`Файл ${document.uri.fsPath} содержит дублирующиеся ключи YAML. Переход к параметрам может работать некорректно.`);
+                window.showWarningMessage(`${document.uri.fsPath} contains duplicate YAML keys`);
             } else {
-                window.showErrorMessage(`Ошибка при разборе YAML-файла ${document.uri.fsPath}: ${error.message}`);
+                window.showErrorMessage(`Failed YAML parse ${document.uri.fsPath}: ${error.message}`);
             }
         }
     }
@@ -31,7 +30,6 @@ export class YamlParser {
         try {
             const resourcePath = resolvePath(baseUri.fsPath, importItem.resource);
             const stats = await fs.promises.stat(resourcePath);
-
             if (stats.isFile()) {
                 await this.processSingleFile(Uri.file(resourcePath));
             } else if (stats.isDirectory()) {
@@ -99,20 +97,17 @@ export class DotenvParser {
         }
 
         const baseDir = workspaceFolder.uri.fsPath;
-        const envFiles = ['.env', '.env.local'];
-
-        for (const filename of envFiles) {
+        ['.env', '.env.local'].forEach(async (filename) => {
             const fullPath = path.join(baseDir, filename);
             if (fs.existsSync(fullPath)) {
                 await this.processSingleFile(Uri.file(fullPath));
             }
-        }
+        });
     }
 
     private async processSingleFile(fileUri: Uri) {
         const doc = await workspace.openTextDocument(fileUri);
         const lines = doc.getText().split('\n');
-
         lines.forEach((line, index) => {
             const match = line.match(/^([A-Z0-9_]+)=/);
             if (match) {

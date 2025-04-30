@@ -1,8 +1,8 @@
 {
     "name": "advanced-yaml-tools",
-    "displayName": "advanced-yaml-tools",
+    "displayName": "Advanced YAML tools",
     "description": "Tools for better YAML development",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "license": "MIT",
     "author": {
         "name": "Alexey Sobolenko",

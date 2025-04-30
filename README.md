@@ -22,7 +22,3 @@ Tools for better YAML development
 
 - `.env` and `.env.local` are parsed automatically.
 - Duplicate keys in YAML may show a warning and skip parsing.
-
-## License
-
-MIT
