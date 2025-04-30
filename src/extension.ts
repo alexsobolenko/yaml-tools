@@ -1,28 +1,23 @@
 import {ExtensionContext, languages, workspace} from 'vscode';
-import {YamlDefinitionProvider} from './providers';
-import {CacheManager, YamlParser} from './services';
+import App from './app';
 
 export function activate(context: ExtensionContext) {
-    const cacheManager = new CacheManager();
-    const yamlParser = new YamlParser(cacheManager);
+    App.instance.providers.forEach((p) => {
+        context.subscriptions.push(languages.registerDefinitionProvider(p.selector, p.provider));
+    });
 
-    context.subscriptions.push(languages.registerDefinitionProvider(
-        {language: 'yaml'},
-        new YamlDefinitionProvider(cacheManager),
-    ));
-
-    const watcher = workspace.createFileSystemWatcher('**/*.{yml,yaml}');
-    context.subscriptions.push(
-        watcher,
-        watcher.onDidChange(async (uri) => {
-            cacheManager.invalidateFile(uri);
-            await yamlParser.processDocument(await workspace.openTextDocument(uri));
-        }),
-    );
+    App.instance.watchers.forEach((w) => {
+        context.subscriptions.push(
+            w.watcher,
+            w.watcher.onDidChange(async (uri) => {
+                await w.handler(uri);
+            }),
+        );
+    });
 
     workspace.findFiles('**/*.{yml,yaml}').then((files) => {
         files.forEach(async (uri) => {
-            await yamlParser.processDocument(await workspace.openTextDocument(uri));
+            await App.instance.yamlParser.processDocument(await workspace.openTextDocument(uri));
         });
     });
 }

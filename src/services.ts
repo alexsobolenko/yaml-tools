@@ -3,6 +3,7 @@ import fs from 'fs';
 import path from 'path';
 import yaml from 'yaml';
 import {resolvePath} from './utils';
+import App from './app';
 
 export class CacheManager {
     private cache = new Map<string, Location>();
@@ -52,12 +53,6 @@ export class CacheManager {
 }
 
 export class YamlParser {
-    private cacheManager: CacheManager;
-
-    constructor(cacheManager: CacheManager) {
-        this.cacheManager = cacheManager;
-    }
-
     public async processDocument(document: TextDocument) {
         try {
             const content = yaml.parse(document.getText());
@@ -119,7 +114,7 @@ export class YamlParser {
         Object.keys(content?.parameters || {}).forEach(async (paramName: string) => {
             const position = await this.findParameterPosition(fileUri, paramName);
             if (position) {
-                this.cacheManager.cacheParam(paramName, new Location(fileUri, position));
+                App.instance.cacheManager.cacheParam(paramName, new Location(fileUri, position));
             }
         });
     }

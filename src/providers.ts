@@ -1,13 +1,7 @@
 import {Definition, DefinitionProvider, Position, ProviderResult, TextDocument} from 'vscode';
-import {CacheManager} from './services';
+import App from './app';
 
 export class YamlDefinitionProvider implements DefinitionProvider {
-    private cacheManager: CacheManager;
-
-    constructor(cacheManager: CacheManager) {
-        this.cacheManager = cacheManager;
-    }
-
     provideDefinition(document: TextDocument, position: Position): ProviderResult<Definition> {
         const wordRange = document.getWordRangeAtPosition(position, /%([^%]+)%/);
         if (!wordRange) {
@@ -16,6 +10,6 @@ export class YamlDefinitionProvider implements DefinitionProvider {
 
         const paramName = document.getText(wordRange).slice(1, -1);
 
-        return this.cacheManager.getParamDefinition(paramName);
+        return App.instance.cacheManager.getParamDefinition(paramName);
     }
 }
