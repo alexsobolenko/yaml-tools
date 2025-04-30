@@ -1,5 +1,6 @@
 import {DefinitionProvider, FileSystemWatcher, Uri, workspace} from 'vscode';
-import {CacheManager, YamlParser} from './services';
+import {CacheManager} from './managers';
+import {YamlParser} from './parsers';
 import {YamlDefinitionProvider} from './providers';
 
 export default class App {
