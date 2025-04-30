@@ -1,7 +1,7 @@
 import {ExtensionContext, languages, workspace} from 'vscode';
 import App from './app';
 
-export function activate(context: ExtensionContext) {
+export async function activate(context: ExtensionContext) {
     App.instance.providers.forEach((p) => {
         context.subscriptions.push(languages.registerDefinitionProvider(p.selector, p.provider));
     });
@@ -19,6 +19,13 @@ export function activate(context: ExtensionContext) {
         files.forEach(async (uri) => {
             await App.instance.yamlParser.processDocument(await workspace.openTextDocument(uri));
         });
+    });
+
+    await App.instance.dotenvParser.processEnvFiles();
+    workspace.onDidSaveTextDocument(async (doc) => {
+        if (doc.uri.fsPath.endsWith('.env') || doc.uri.fsPath.endsWith('.env.local')) {
+            await App.instance.dotenvParser.processEnvFiles();
+        }
     });
 }
 

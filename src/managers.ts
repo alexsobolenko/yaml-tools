@@ -28,7 +28,6 @@ export class CacheManager {
             paramsInFile.forEach((paramName) => {
                 const locations = this.history.get(paramName) || [];
                 const updatedLocations = locations.filter((loc) => loc.uri.toString() !== fileKey);
-
                 this.history.set(paramName, updatedLocations);
 
                 if (updatedLocations.length > 0) {

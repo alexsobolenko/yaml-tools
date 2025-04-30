@@ -85,3 +85,36 @@ export class YamlParser {
         return null;
     }
 }
+
+export class DotenvParser {
+    async processEnvFiles() {
+        const workspaceFolder = workspace.workspaceFolders?.[0];
+        if (!workspaceFolder) {
+            return;
+        }
+
+        const baseDir = workspaceFolder.uri.fsPath;
+        const envFiles = ['.env', '.env.local'];
+
+        for (const filename of envFiles) {
+            const fullPath = path.join(baseDir, filename);
+            if (fs.existsSync(fullPath)) {
+                await this.processSingleFile(Uri.file(fullPath));
+            }
+        }
+    }
+
+    private async processSingleFile(fileUri: Uri) {
+        const doc = await workspace.openTextDocument(fileUri);
+        const lines = doc.getText().split('\n');
+
+        lines.forEach((line, index) => {
+            const match = line.match(/^([A-Z0-9_]+)=/);
+            if (match) {
+                const varName = match[1] as string;
+                const location = new Location(fileUri, new Position(index, 0));
+                App.instance.cacheManager.cacheParam(varName, location);
+            }
+        });
+    }
+}

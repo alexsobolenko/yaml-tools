@@ -1,16 +1,18 @@
 import {DefinitionProvider, FileSystemWatcher, Uri, workspace} from 'vscode';
 import {CacheManager} from './managers';
-import {YamlParser} from './parsers';
-import {YamlDefinitionProvider} from './providers';
+import {DotenvParser, YamlParser} from './parsers';
+import {DotenvDefinitionProvider, YamlDefinitionProvider} from './providers';
 
 export default class App {
     private static _instance: App;
     private _cacheManager: CacheManager;
     private _yamlParser: YamlParser;
+    private _dotenvParser: DotenvParser;
 
     private constructor() {
         this._cacheManager = new CacheManager();
         this._yamlParser = new YamlParser();
+        this._dotenvParser = new DotenvParser();
     }
 
     public static get instance(): App {
@@ -29,11 +31,19 @@ export default class App {
         return this._yamlParser;
     }
 
+    public get dotenvParser(): DotenvParser {
+        return this._dotenvParser;
+    }
+
     public get providers(): Array<{selector: Object, provider: DefinitionProvider}> {
         return [
             {
                 selector: {language: 'yaml'},
                 provider: new YamlDefinitionProvider(),
+            },
+            {
+                selector: {language: 'yaml'},
+                provider: new DotenvDefinitionProvider(),
             },
         ];
     }

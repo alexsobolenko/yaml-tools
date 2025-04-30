@@ -13,3 +13,32 @@ export class YamlDefinitionProvider implements DefinitionProvider {
         return App.instance.cacheManager.getParamDefinition(paramName);
     }
 }
+
+export class DotenvDefinitionProvider implements DefinitionProvider {
+    provideDefinition(document: TextDocument, position: Position): ProviderResult<Definition> {
+        const wordRange = document.getWordRangeAtPosition(position, /%env\(([^)]+)\)%|\${([^}]+)}/);
+        if (!wordRange) {
+            return null;
+        }
+
+        const text = document.getText(wordRange);
+        let varName: string | null = null;
+
+        const envMatch = text.match(/^%env\(([^)]+)\)%$/);
+        const dockerMatch = text.match(/^\${([^}]+)}$/);
+
+        if (envMatch) {
+            const raw = envMatch[1] as string;
+            const parts = raw.split(':');
+            varName = parts.length > 1 ? parts.slice(1).join(':') : parts[0];
+        } else if (dockerMatch) {
+            varName = dockerMatch[1] as string;
+        }
+
+        if (varName) {
+            return App.instance.cacheManager.getParamDefinition(varName);
+        }
+
+        return null;
+    }
+}
