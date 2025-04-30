@@ -5,3 +5,5 @@
 ### Added
 
 - Initial release
+- Yaml params
+- Dotenv params
