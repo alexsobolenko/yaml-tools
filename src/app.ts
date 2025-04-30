@@ -2,6 +2,7 @@ import {DefinitionProvider, FileSystemWatcher, Uri, workspace} from 'vscode';
 import {CacheManager} from './managers';
 import {DotenvParser, YamlParser} from './parsers';
 import {DotenvDefinitionProvider, YamlDefinitionProvider} from './providers';
+import {YAML_FILES} from './constants';
 
 export default class App {
     private static _instance: App;
@@ -51,7 +52,7 @@ export default class App {
     public get watchers(): Array<{watcher: FileSystemWatcher, handler: any}> {
         return [
             {
-                watcher: workspace.createFileSystemWatcher('**/*.{yml,yaml}'),
+                watcher: workspace.createFileSystemWatcher(YAML_FILES),
                 handler: async (uri: Uri) => {
                     App.instance.cacheManager.invalidateFile(uri);
                     await App.instance.yamlParser.processDocument(await workspace.openTextDocument(uri));

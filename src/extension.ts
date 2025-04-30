@@ -1,5 +1,6 @@
 import {ExtensionContext, languages, workspace} from 'vscode';
 import App from './app';
+import {YAML_FILES} from './constants';
 
 export async function activate(context: ExtensionContext) {
     App.instance.providers.forEach((p) => {
@@ -15,7 +16,7 @@ export async function activate(context: ExtensionContext) {
         );
     });
 
-    workspace.findFiles('**/*.{yml,yaml}').then((files) => {
+    workspace.findFiles(YAML_FILES).then((files) => {
         files.forEach(async (uri) => {
             await App.instance.yamlParser.processDocument(await workspace.openTextDocument(uri));
         });

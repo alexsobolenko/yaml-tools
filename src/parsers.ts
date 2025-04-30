@@ -13,8 +13,13 @@ export class YamlParser {
                 await this.processImport(document.uri, importItem);
             });
             await this.cacheParametersFromFile(document.uri, content);
-        } catch (error) {
-            console.error('YAML parsing failed:', error);
+        } catch (error: any) {
+            if (error.name === 'YAMLParseError' && error.code === 'DUPLICATE_KEY') {
+                // eslint-disable-next-line max-len
+                window.showWarningMessage(`Файл ${document.uri.fsPath} содержит дублирующиеся ключи YAML. Переход к параметрам может работать некорректно.`);
+            } else {
+                window.showErrorMessage(`Ошибка при разборе YAML-файла ${document.uri.fsPath}: ${error.message}`);
+            }
         }
     }
 
