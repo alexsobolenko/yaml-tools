@@ -1,5 +1,11 @@
 # Change Log
 
+## [0.1.2] - 2025-05-05
+
+### Changed
+
+- Icon updated
+
 ## [0.1.1] - 2025-04-30
 
 ### Changed
