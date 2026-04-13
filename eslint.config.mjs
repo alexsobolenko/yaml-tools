@@ -2,10 +2,14 @@ import typescriptEslint from '@typescript-eslint/eslint-plugin';
 import tsParser from '@typescript-eslint/parser';
 
 export default [{
+    ignores: [
+        'node_modules/**',
+        'out/**',
+    ],
+}, {
     files: [
         '**/*.ts',
     ],
-}, {
     plugins: {
         '@typescript-eslint': typescriptEslint,
     },

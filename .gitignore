@@ -2,3 +2,5 @@
 /node_modules/
 /out/
 /advanced-yaml-tools-*.vsix
+AGENTS.md
+.codex

@@ -1,0 +1,11 @@
+.codex
+.github
+.vscode
+src
+AGENTS.md
+.vscodeignore
+.gitignore
+.editorconfig
+eslint.config.mjs
+tsconfig.json
+*.tgz

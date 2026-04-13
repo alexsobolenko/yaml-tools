@@ -10,25 +10,30 @@ export async function activate(context: ExtensionContext) {
         context.subscriptions.push(
             w.watcher,
             w.watcher.onDidChange(async (uri) => {
-                await w.handler(uri);
+                await w.onChange(uri);
+            }),
+            w.watcher.onDidCreate(async (uri) => {
+                await w.onCreate(uri);
+            }),
+            w.watcher.onDidDelete((uri) => {
+                w.onDelete(uri);
             }),
         );
     });
 
     // yaml
-    workspace.findFiles(YAML_FILES).then((files) => {
-        files.forEach(async (uri) => {
-            await App.instance.yamlParser.processDocument(await workspace.openTextDocument(uri));
-        });
-    });
+    const files = await workspace.findFiles(YAML_FILES);
+    for (const uri of files) {
+        await App.instance.yamlParser.processDocument(await workspace.openTextDocument(uri));
+    }
 
     // dotenv
     await App.instance.dotenvParser.processEnvFiles();
-    workspace.onDidSaveTextDocument(async (doc) => {
+    context.subscriptions.push(workspace.onDidSaveTextDocument(async (doc) => {
         if (doc.uri.fsPath.endsWith('.env') || doc.uri.fsPath.endsWith('.env.local')) {
             await App.instance.dotenvParser.processEnvFiles();
         }
-    });
+    }));
 }
 
 export function deactivate() {}

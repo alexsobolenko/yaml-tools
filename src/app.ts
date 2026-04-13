@@ -1,8 +1,20 @@
-import {DefinitionProvider, FileSystemWatcher, Uri, workspace} from 'vscode';
+import {DefinitionProvider, DocumentSelector, FileSystemWatcher, Uri, workspace} from 'vscode';
 import {CacheManager} from './managers';
 import {DotenvParser, YamlParser} from './parsers';
 import {DotenvDefinitionProvider, YamlDefinitionProvider} from './providers';
 import {YAML_FILES} from './constants';
+
+type ProviderRegistration = {
+    selector: DocumentSelector;
+    provider: DefinitionProvider;
+};
+
+type WatchRegistration = {
+    watcher: FileSystemWatcher;
+    onChange: (uri: Uri) => Promise<void>;
+    onCreate: (uri: Uri) => Promise<void>;
+    onDelete: (uri: Uri) => void;
+};
 
 export default class App {
     private static _instance: App;
@@ -36,7 +48,7 @@ export default class App {
         return this._dotenvParser;
     }
 
-    public get providers(): Array<{selector: Object, provider: DefinitionProvider}> {
+    public get providers(): ProviderRegistration[] {
         return [
             {
                 selector: {language: 'yaml'},
@@ -49,13 +61,18 @@ export default class App {
         ];
     }
 
-    public get watchers(): Array<{watcher: FileSystemWatcher, handler: any}> {
+    public get watchers(): WatchRegistration[] {
         return [
             {
                 watcher: workspace.createFileSystemWatcher(YAML_FILES),
-                handler: async (uri: Uri) => {
-                    App.instance.cacheManager.invalidateFile(uri);
+                onChange: async (uri: Uri) => {
                     await App.instance.yamlParser.processDocument(await workspace.openTextDocument(uri));
+                },
+                onCreate: async (uri: Uri) => {
+                    await App.instance.yamlParser.processDocument(await workspace.openTextDocument(uri));
+                },
+                onDelete: (uri: Uri) => {
+                    App.instance.cacheManager.invalidateFile(uri);
                 },
             },
         ];

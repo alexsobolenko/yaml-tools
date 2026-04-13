@@ -1,8 +1,8 @@
 {
     "name": "advanced-yaml-tools",
-    "displayName": "Advanced YAML tools",
-    "description": "Tools for better YAML development",
-    "version": "0.1.2",
+    "displayName": "Advanced YAML Tools",
+    "description": "VS Code extension for navigating YAML parameters and environment variables",
+    "version": "0.2.0",
     "license": "MIT",
     "author": {
         "name": "Alexey Sobolenko",
@@ -11,6 +11,10 @@
     "repository": {
         "type": "git",
         "url": "https://github.com/alexsobolenko/yaml-tools.git"
+    },
+    "homepage": "https://github.com/alexsobolenko/yaml-tools#readme",
+    "bugs": {
+        "url": "https://github.com/alexsobolenko/yaml-tools/issues"
     },
     "icon": "assets/icon.png",
     "publisher": "alexsobolenko",
@@ -23,7 +27,9 @@
     ],
     "keywords": [
         "yaml",
-        "dotenv"
+        "dotenv",
+        "configuration",
+        "environment"
     ],
     "activationEvents": [
         "onLanguage:yaml"
@@ -41,20 +47,21 @@
         "watch": "tsc -watch -p ./",
         "pretest": "npm run compile && npm run lint",
         "lint": "eslint src",
-        "test": "vscode-test"
+        "package": "vsce package",
+        "publish": "vsce publish"
     },
     "devDependencies": {
         "@types/mocha": "^10.0.10",
         "@types/node": "20.x",
         "@types/vscode": "^1.96.0",
-        "@typescript-eslint/eslint-plugin": "^8.17.0",
-        "@typescript-eslint/parser": "^8.17.0",
-        "@vscode/test-cli": "^0.0.10",
-        "@vscode/test-electron": "^2.4.1",
-        "eslint": "^9.16.0",
-        "typescript": "^5.7.2"
+        "@typescript-eslint/eslint-plugin": "^8.58.1",
+        "@typescript-eslint/parser": "^8.58.1",
+        "@vscode/test-cli": "^0.0.12",
+        "@vscode/test-electron": "^2.5.2",
+        "eslint": "^9.39.4",
+        "typescript": "^5.9.3"
     },
     "dependencies": {
-        "yaml": "^2.7.1"
+        "yaml": "^2.8.3"
     }
 }
